@@ -1,5 +1,5 @@
 <?php
-namespace ParseTools\Csv;
+namespace CSV;
 
 class Parser
 {
