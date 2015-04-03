@@ -1,0 +1,20 @@
+{
+  "name": "wp/csv",
+  "type": "package",
+  "license": "MIT",
+  "description": "CSV reading, parsing & writing utils",
+  "homepage": "https://github.com/webproducer/csv",
+  "authors": [
+    {
+      "name": "Alexander Safronov",
+      "email": "safron@webproducers.ru"
+    }
+  ],
+
+  "autoload" : {
+    "psr-0" : {
+      "CSV": "src/"
+    }
+  }
+
+}
