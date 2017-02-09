@@ -3,9 +3,11 @@ namespace CSV;
 
 class Parser
 {
+    const DEFAULT_SEPARATOR = ',';
+
     // take a CSV line (utf-8 encoded) and returns an array
     // 'string1,string2,"string3","the ""string4"""' => array('string1', 'string2', 'string3', 'the "string4"')
-    public static function parseString($string, $separator = ',') {
+    public static function parseString($string, $separator = self::DEFAULT_SEPARATOR) {
         $values = array();
         $string = str_replace("\r\n", '', $string); // eat the traling new line, if any
         if ($string == '') {
@@ -49,9 +51,9 @@ class Parser
         return $values;
     }
 
-    public static function escapeString($string) {
+    public static function escapeString($string, $sep = self::DEFAULT_SEPARATOR) {
         $string = str_replace('"', '""', $string);
-        if (strpos($string, '"') !== false or strpos($string, ',') !== false or strpos($string, "\r") !== false or strpos($string, "\n") !== false) {
+        if (strpos($string, '"') !== false or strpos($string, $sep) !== false or strpos($string, "\r") !== false or strpos($string, "\n") !== false) {
             $string = '"'.$string.'"';
         }
         return $string;
