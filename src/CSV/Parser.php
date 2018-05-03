@@ -1,4 +1,5 @@
 <?php
+
 namespace CSV;
 
 class Parser
@@ -7,7 +8,8 @@ class Parser
 
     // take a CSV line (utf-8 encoded) and returns an array
     // 'string1,string2,"string3","the ""string4"""' => array('string1', 'string2', 'string3', 'the "string4"')
-    public static function parseString($string, $separator = self::DEFAULT_SEPARATOR) {
+    public static function parseString($string, $separator = self::DEFAULT_SEPARATOR)
+    {
         $values = array();
         $string = str_replace("\r\n", '', $string); // eat the traling new line, if any
         if ($string == '') {
@@ -24,7 +26,7 @@ class Parser
                 $token = substr($token, 1); // remove leading quote
                 do {
                     // concatenate with next token while incomplete
-                    $complete = self::_hasEndQuote($token);
+                    $complete = self::hasEndQuote($token);
                     $token = str_replace('""', '"', $token); // unescape escaped quotes
                     $len = strlen($token);
                     if ($complete) {
@@ -51,10 +53,12 @@ class Parser
         return $values;
     }
 
-    public static function escapeString($string, $sep = self::DEFAULT_SEPARATOR) {
+    public static function escapeString($string, $sep = self::DEFAULT_SEPARATOR)
+    {
         $string = str_replace('"', '""', $string);
-        if (strpos($string, '"') !== false or strpos($string, $sep) !== false or strpos($string, "\r") !== false or strpos($string, "\n") !== false) {
-            $string = '"'.$string.'"';
+        if (strpos($string, '"') !== false or strpos($string, $sep) !== false or strpos($string,
+                "\r") !== false or strpos($string, "\n") !== false) {
+            $string = '"' . $string . '"';
         }
         return $string;
     }
@@ -63,21 +67,22 @@ class Parser
     // 'string"' => true
     // 'string""' => false
     // 'string"""' => true
-    public static function _hasEndQuote($token) {
+    public static function hasEndQuote($token)
+    {
         $len = strlen($token);
         if ($len == 0) {
             return false;
         } elseif ($len == 1 and $token == '"') {
             return true;
         } elseif ($len > 1) {
-            while ($len > 1 and $token[$len-1] == '"' and $token[$len-2] == '"') {
+            while ($len > 1 and $token[$len - 1] == '"' and $token[$len - 2] == '"') {
                 // there is an escaped quote at the end
                 $len -= 2; // strip the escaped quote at the end
             }
             if ($len == 0) {
                 // the string was only some escaped quotes
                 return false;
-            } elseif ($token[$len-1] == '"') {
+            } elseif ($token[$len - 1] == '"') {
                 // the last quote was not escaped
                 return true;
             } else {
@@ -88,7 +93,8 @@ class Parser
     }
 
     // very basic separator detection function
-    public static function detectSeparator($filename, $separators = array(',', ';')) {
+    public static function detectSeparator($filename, $separators = array(',', ';'))
+    {
         $file = fopen($filename, 'r');
         $string = fgets($file);
         fclose($file);
