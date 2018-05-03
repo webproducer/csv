@@ -12,8 +12,8 @@
   ],
 
   "autoload" : {
-    "psr-0" : {
-      "CSV": "src/"
+    "psr-4" : {
+      "CSV\\": "src"
     }
   }
 
