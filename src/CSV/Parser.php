@@ -6,12 +6,19 @@ class Parser
 {
     const DEFAULT_SEPARATOR = ',';
 
-    // take a CSV line (utf-8 encoded) and returns an array
-    // 'string1,string2,"string3","the ""string4"""' => array('string1', 'string2', 'string3', 'the "string4"')
+    /**
+     * Take a CSV line (utf-8 encoded) && returns an array
+     * 'string1,string2,"string3","the ""string4"""' => array('string1', 'string2', 'string3', 'the "string4"')
+     *
+     * @param $string
+     * @param string $separator
+     * @return array
+     * @throws \Exception
+     */
     public static function parseString($string, $separator = self::DEFAULT_SEPARATOR)
     {
         $values = array();
-        $string = str_replace("\r\n", '', $string); // eat the traling new line, if any
+        $string = str_replace("\r\n", '', $string); // eat the trailing new line, if any
         if ($string == '') {
             return $values;
         }
@@ -21,33 +28,37 @@ class Parser
             $token = $tokens[$i];
             $len = strlen($token);
             $newValue = '';
-            if ($len > 0 and $token[0] == '"') {
-                // if quoted
-                $token = substr($token, 1); // remove leading quote
-                do {
-                    // concatenate with next token while incomplete
-                    $complete = self::hasEndQuote($token);
-                    $token = str_replace('""', '"', $token); // unescape escaped quotes
-                    $len = strlen($token);
-                    if ($complete) {
-                        // if complete
-                        $newValue .= substr($token, 0, -1); // remove trailing quote
-                    } else {
-                        // incomplete, get one more token
-                        $newValue .= $token;
-                        $newValue .= $separator;
-                        if ($i == $count - 1) {
-                            throw new \Exception('Illegal unescaped quote.');
-                        }
-                        $token = $tokens[++$i];
-                    }
-                } while (!$complete);
-
-            } else {
-                // unescaped, use token as is
-                $newValue .= $token;
+            if (!self::hasStartQuote($token, $len)) {
+                // No quoted token use as is
+                $values[] = $token;
+                continue;
             }
-
+            // if quoted
+            $token = substr($token, 1); // remove leading quote
+            $len--;
+            do {
+                // concatenate with next token while incomplete
+                $complete = self::hasValidEndQuote($token, $len);
+                $token = str_replace('\\""', '\\"', $token, $isReplacedSlashes);
+                $token = str_replace('""', '"', $token, $isReplacedQuotes); // unescape escaped quotes
+                if ($complete) {
+                    if ($isReplacedSlashes || $isReplacedQuotes) {
+                        $len = strlen($token);
+                    }
+                    if ((($len == 1) && ($token == '"')) || isset($token[-2]) && ($token[-2] != '\\')) {
+                        $token = substr($token, 0, -1); // remove trailing quote
+                    }
+                    $newValue .= $token;
+                } else {
+                    // incomplete, get one more token
+                    $newValue .= $token;
+                    $newValue .= $separator;
+                    if ($i == $count - 1) {
+                        throw new \Exception('Illegal unescaped quote.');
+                    }
+                    $token = $tokens[++$i];
+                }
+            } while (!$complete);
             $values[] = $newValue;
         }
         return $values;
@@ -56,8 +67,8 @@ class Parser
     public static function escapeString($string, $sep = self::DEFAULT_SEPARATOR)
     {
         $string = str_replace('"', '""', $string);
-        if (strpos($string, '"') !== false or strpos($string, $sep) !== false or strpos($string,
-                "\r") !== false or strpos($string, "\n") !== false) {
+        if ((strpos($string, '"') !== false) || (strpos($string, $sep) !== false) ||
+            (strpos($string, "\r") !== false) || (strpos($string, "\n") !== false)) {
             $string = '"' . $string . '"';
         }
         return $string;
@@ -67,28 +78,25 @@ class Parser
     // 'string"' => true
     // 'string""' => false
     // 'string"""' => true
-    public static function hasEndQuote($token)
+    // 'string\""' => true
+    private static function hasValidEndQuote($token, $len)
     {
-        $len = strlen($token);
+        if ($len == 1) {
+            return $token == '"';
+        }
+        while ($len > 1 && $token[$len - 1] == '"' && $token[$len - 2] == '"') {
+            // there is an escaped quote at the end
+            $len -= 2; // strip the escaped quote at the end
+        }
         if ($len == 0) {
+            // the string was only some escaped quotes
             return false;
-        } elseif ($len == 1 and $token == '"') {
+        } elseif (($token[$len - 1] == '"') || ($token[$len - 1] == "\\")) {
+            // the last quote was not escaped
             return true;
-        } elseif ($len > 1) {
-            while ($len > 1 and $token[$len - 1] == '"' and $token[$len - 2] == '"') {
-                // there is an escaped quote at the end
-                $len -= 2; // strip the escaped quote at the end
-            }
-            if ($len == 0) {
-                // the string was only some escaped quotes
-                return false;
-            } elseif ($token[$len - 1] == '"') {
-                // the last quote was not escaped
-                return true;
-            } else {
-                // was not ending with an unescaped quote
-                return false;
-            }
+        } else {
+            // was not ending with an unescaped quote
+            return false;
         }
     }
 
@@ -105,5 +113,10 @@ class Parser
             }
         }
         return (count($matched) == 1) ? $matched[0] : null;
+    }
+
+    private static function hasStartQuote($token, $len)
+    {
+        return ($len == 0) || ($token[0] == '"');
     }
 }
