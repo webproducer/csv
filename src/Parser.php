@@ -57,6 +57,7 @@ class Parser
                         throw new \Exception('Illegal unescaped quote.');
                     }
                     $token = $tokens[++$i];
+                    $len = strlen($token);
                 }
             } while (!$complete);
             $values[] = $newValue;
