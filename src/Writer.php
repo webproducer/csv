@@ -1,4 +1,5 @@
 <?php
+
 namespace CSV;
 
 class Writer
@@ -14,7 +15,7 @@ class Writer
      * Writer constructor.
      * @param resource $output
      * @param int $encoding
-     * @todo Add separator param
+     * @param string $sep
      */
     public function __construct(
         $output,
@@ -29,7 +30,8 @@ class Writer
     /**
      * @param array $values
      */
-    public function addLine(array $values) {
+    public function addLine(array $values)
+    {
         foreach ($values as $key => $value) {
             $enc = Parser::escapeString($value, $this->sep);
             if ($this->encoding == self::ENCODING_ISO) {
@@ -40,5 +42,4 @@ class Writer
         $string = implode($this->sep, $values) . "\r\n";
         fwrite($this->fileHandle, $string);
     }
-
 }

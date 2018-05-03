@@ -1,4 +1,5 @@
 <?php
+
 namespace CSV;
 
 class Reader implements \Iterator
@@ -28,36 +29,42 @@ class Reader implements \Iterator
         $this->encoding = $encoding;
         $this->fileHandle = $file;
         $this->position = 0;
-        $this->_readLine();
+        $this->readLine();
     }
 
-    public function rewind() {
+    public function rewind()
+    {
         if ($this->fileHandle) {
             $this->position = 0;
             rewind($this->fileHandle);
         }
 
-        $this->_readLine();
+        $this->readLine();
     }
 
-    public function current() {
+    public function current()
+    {
         return $this->currentArray;
     }
 
-    public function key() {
+    public function key()
+    {
         return $this->position;
     }
 
-    public function next() {
+    public function next()
+    {
         $this->position++;
-        $this->_readLine();
+        $this->readLine();
     }
 
-    public function valid() {
+    public function valid()
+    {
         return $this->currentArray !== null;
     }
 
-    protected function _readLine() {
+    protected function readLine()
+    {
         if (!feof($this->fileHandle)) {
             $this->currentLine = fgets($this->fileHandle);
             if ($this->encoding == self::ENCODING_ISO) {
