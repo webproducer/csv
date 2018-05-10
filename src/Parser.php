@@ -39,15 +39,8 @@ class Parser
             do {
                 // concatenate with next token while incomplete
                 $complete = self::hasValidEndQuote($token, $len);
-                $token = str_replace('\\""', '\\"', $token, $isReplacedSlashes);
-                $token = str_replace('""', '"', $token, $isReplacedQuotes); // unescape escaped quotes
                 if ($complete) {
-                    if ($isReplacedSlashes || $isReplacedQuotes) {
-                        $len = strlen($token);
-                    }
-                    if ((($len == 1) && ($token == '"')) || isset($token[-2]) && ($token[-2] != '\\')) {
-                        $token = substr($token, 0, -1); // remove trailing quote
-                    }
+                    $token = substr($token, 0, -1); // remove trailing quote
                     $newValue .= $token;
                 } else {
                     // incomplete, get one more token
@@ -60,7 +53,7 @@ class Parser
                     $len = strlen($token);
                 }
             } while (!$complete);
-            $values[] = $newValue;
+            $values[] = str_replace('""', '"', $newValue); // unescape escaped quotes;
         }
         return $values;
     }
@@ -82,23 +75,35 @@ class Parser
     // 'string\""' => true
     private static function hasValidEndQuote($token, $len)
     {
+        if ($len == 0) {
+            return false;
+        }
         if ($len == 1) {
             return $token == '"';
         }
-        while ($len > 1 && $token[$len - 1] == '"' && $token[$len - 2] == '"') {
-            // there is an escaped quote at the end
-            $len -= 2; // strip the escaped quote at the end
-        }
-        if ($len == 0) {
-            // the string was only some escaped quotes
-            return false;
-        } elseif (($token[$len - 1] == '"') || ($token[$len - 1] == "\\")) {
-            // the last quote was not escaped
-            return true;
-        } else {
-            // was not ending with an unescaped quote
+        if ($token[$len - 1] != '"') {
             return false;
         }
+        $i = $len - 1;
+        $quotesCount = 0;
+        while ($i >= 0) {
+            if ($token[$i] == '"') {
+                $quotesCount++;
+            } else {
+                break;
+            }
+            $i--;
+        }
+        $slashesCount = 0;
+        while ($i >= 0) {
+            if ($token[$i] == '\\') {
+                $slashesCount++;
+            } else {
+                break;
+            }
+            $i--;
+        }
+        return ($quotesCount + $slashesCount) % 2 != 0;
     }
 
     // very basic separator detection function
