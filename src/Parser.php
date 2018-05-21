@@ -123,6 +123,6 @@ class Parser
 
     private static function hasStartQuote($token, $len)
     {
-        return ($len == 0) || ($token[0] == '"');
+        return ($len > 0) && ($token[0] == '"');
     }
 }
