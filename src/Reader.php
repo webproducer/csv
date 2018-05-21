@@ -19,6 +19,7 @@ class Reader implements \Iterator
      * @param resource $file
      * @param string $separator
      * @param int $encoding
+     * @throws \Exception
      */
     public function __construct(
         $file,
@@ -32,6 +33,9 @@ class Reader implements \Iterator
         $this->readLine();
     }
 
+    /**
+     * @throws \Exception
+     */
     public function rewind()
     {
         if ($this->fileHandle) {
@@ -52,6 +56,9 @@ class Reader implements \Iterator
         return $this->position;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function next()
     {
         $this->position++;
@@ -63,6 +70,9 @@ class Reader implements \Iterator
         return $this->currentArray !== null;
     }
 
+    /**
+     * @throws \Exception
+     */
     protected function readLine()
     {
         if (!feof($this->fileHandle)) {
