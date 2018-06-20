@@ -21,6 +21,9 @@ class ParserTest extends TestCase
     public function parseStringDataProvider()
     {
         return [
+            ['', []],
+            [',', ['', '']],
+            [',,', ['', '', '']],
             ['""', ['']],
             ['","', [',']],
             ['""""""', ['""']],

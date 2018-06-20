@@ -8,9 +8,8 @@ class Reader implements \Iterator
     const ENCODING_UTF = 2;
 
     protected $fileHandle = null;
-    protected $position = null;
-    protected $currentLine = null;
-    protected $currentArray = null;
+    protected $position = 0;
+    protected $currentLine = false;
     protected $separator = ',';
     protected $encoding = self::ENCODING_ISO;
 
@@ -19,7 +18,6 @@ class Reader implements \Iterator
      * @param resource $file
      * @param string $separator
      * @param int $encoding
-     * @throws \Exception
      */
     public function __construct(
         $file,
@@ -29,65 +27,62 @@ class Reader implements \Iterator
         $this->separator = $separator;
         $this->encoding = $encoding;
         $this->fileHandle = $file;
-        $this->position = 0;
         $this->readLine();
     }
 
-    /**
-     * @throws \Exception
-     */
     public function rewind()
     {
         if ($this->fileHandle) {
             $this->position = 0;
             rewind($this->fileHandle);
+            $this->readLine();
         }
-
-        $this->readLine();
     }
 
+    /**
+     * @return array|null
+     * @throws \Exception
+     */
     public function current()
     {
-        return $this->currentArray;
+        if ($this->encoding == self::ENCODING_ISO) {
+            $this->currentLine = utf8_encode($this->currentLine);
+        }
+        $this->currentLine = trim($this->currentLine);
+        if ($this->currentLine == '') {
+            return null;
+        }
+        try {
+            return Parser::parseString($this->currentLine, $this->separator);
+        } catch (\Exception $e) {
+            throw new \Exception("{$e->getMessage()} ({$this->currentLine})", $e->getCode(), $e);
+        }
     }
 
+    /**
+     * @return int
+     */
     public function key()
     {
         return $this->position;
     }
 
-    /**
-     * @throws \Exception
-     */
     public function next()
     {
         $this->position++;
         $this->readLine();
     }
 
+    /**
+     * @return bool
+     */
     public function valid()
     {
-        return $this->currentArray !== null;
+        return $this->currentLine !== false;
     }
 
-    /**
-     * @throws \Exception
-     */
     protected function readLine()
     {
-        if (!feof($this->fileHandle)) {
-            $this->currentLine = fgets($this->fileHandle);
-            if ($this->encoding == self::ENCODING_ISO) {
-                $this->currentLine = utf8_encode($this->currentLine);
-            }
-            $this->currentLine = trim($this->currentLine);
-        } else {
-            $this->currentLine = null;
-        }
-        if ($this->currentLine != '') {
-            $this->currentArray = Parser::parseString($this->currentLine, $this->separator);
-        } else {
-            $this->currentArray = null;
-        }
+        $this->currentLine = fgets($this->fileHandle);
     }
 }
