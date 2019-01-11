@@ -3,10 +3,10 @@ CSV reading, parsing &amp; writing utils
 
 ## Features
 
-* Operating according [RFC 4180](https://tools.ietf.org/html/rfc4180)
-* Parsing CSV data from stream - as well as from string
+* Operating according to [RFC 4180](https://tools.ietf.org/html/rfc4180)
+* Parsing CSV data from streams - as well as from strings
 * All parsed results are accessible through memory efficient generators
-* Fields mapping
+* Headers mapping
 * UTF-8 support
 
 ## Examples
