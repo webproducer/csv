@@ -8,6 +8,10 @@
     {
       "name": "Alexander Safronov",
       "email": "safron@webproducers.ru"
+    },
+    {
+      "name": "Vladimir Ekhvalov",
+      "email": "ekhvalov@gmail.com"
     }
   ],
   "autoload" : {
@@ -15,6 +19,9 @@
       "CSV\\": "src",
       "CSV\\Test\\": "test"
     }
+  },
+  "require": {
+    "php": ">=7.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^7.1"
