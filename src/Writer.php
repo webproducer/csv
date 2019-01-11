@@ -23,7 +23,7 @@ class Writer
     /**
      * @param array $values
      */
-    public function addLine(array $values)
+    public function writeRow(array $values)
     {
         foreach ($values as $key => $value) {
             $enc = $this->escapeString($value);

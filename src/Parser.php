@@ -4,7 +4,6 @@ namespace CSV;
 
 class Parser
 {
-
     const S_NEXT_FLD = 'S_NEXT_FLD';
     const S_FIRST_QUOT = 'S_FIRST_QUOT';
     const S_QUOTED_FLD = 'S_QUOTED_FLD';
