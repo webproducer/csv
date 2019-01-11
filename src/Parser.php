@@ -1,6 +1,8 @@
 <?php
 namespace CSV;
 
+use CSV\Internal\{DataReaderInterface, Lexer, StreamReader, StringReader, Token};
+
 
 class Parser
 {
@@ -24,14 +26,27 @@ class Parser
 
     /**
      * @todo auto-wrapper for string type
-     * @todo accept only CRLF as row divider in strict mode
      * @param resource $stream
      * @return \Generator|array[]
      * @throws Exception
      * @throws ParseException
+     * @todo accept only CRLF as row divider in strict mode
      */
     public function parse($stream): \Generator
     {
+        switch (true) {
+            case is_resource($stream):
+                $stream = new StreamReader($stream);
+                break;
+            case is_string($stream):
+                $stream = new StringReader($stream);
+                break;
+            case ($stream instanceof DataReaderInterface):
+                // will be used as is
+                break;
+            default:
+                throw new \InvalidArgumentException("Argument must be of type resource, string or be an implementation of DataReaderInterface");
+        }
         $this->reset();
         $lexer = new Lexer($this->options->separator);
         foreach ($lexer->lex($stream) as [$type, $val, $pos]) {

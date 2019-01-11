@@ -1,5 +1,5 @@
 <?php
-namespace CSV;
+namespace CSV\Internal;
 
 
 class Lexer
@@ -14,25 +14,19 @@ class Lexer
     }
 
     /**
-     * @param resource $stream
+     * @param DataReaderInterface $stream
      * @return \Generator|Token[]
      */
-    public function lex($stream): \Generator
+    public function lex(DataReaderInterface $stream): \Generator
     {
-        if (!is_resource($stream)) {
-            throw new \InvalidArgumentException(sprintf(
-                'Lexer can read only resources (%s given)',
-                gettype($stream)
-            ));
-        }
         $pos = -1;
         $cur = -1;
         $buf = '';
         $map = array_merge(self::getTokenMap(), [
             $this->sep => Token::T_SEP
         ]);
-        while (!feof($stream)) {
-            $data = fgets($stream, self::READ_SIZE);
+        while (!$stream->isEof()) {
+            $data = $stream->read(self::READ_SIZE);
             $len = strlen($data);
             for ($i=0; $i<$len; $i++) {
                 $c = $data{$i};

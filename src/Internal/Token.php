@@ -1,5 +1,5 @@
 <?php
-namespace CSV;
+namespace CSV\Internal;
 
 
 class Token
