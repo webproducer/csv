@@ -142,7 +142,7 @@ class Parser
                 $this->changeState(self::S_NEXT_FLD);
                 break;
             default:
-                $this->throwParseError($type, $pos);
+                $this->throwUnexpectedTokenError($type, $pos);
         }
     }
 
@@ -167,7 +167,7 @@ class Parser
                 $this->changeState(self::S_NEXT_FLD);
                 break;
             default:
-                $this->throwParseError($type, $pos);
+                $this->throwUnexpectedTokenError($type, $pos);
         }
     }
 
@@ -189,8 +189,11 @@ class Parser
             case self::S_QUOTED_FLD:
                 $this->changeState(self::S_FIRST_QUOT);
                 break;
+            case self::S_UNQUOTED_FLD:
+                $this->buf.= '"';
+                break;
             default:
-                $this->throwParseError($type, $pos);
+                $this->throwUnexpectedTokenError($type, $pos);
         }
     }
 
@@ -212,7 +215,7 @@ class Parser
                 $this->buf.= $val;
                 break;
             default:
-                $this->throwParseError($type, $pos);
+                $this->throwUnexpectedTokenError($type, $pos);
         }
     }
 
@@ -221,7 +224,7 @@ class Parser
      * @param int $pos
      * @throws ParseException
      */
-    private function throwParseError(string $type, int $pos)
+    private function throwUnexpectedTokenError(string $type, int $pos)
     {
         throw new ParseException(sprintf(
             "CSV parse error: unexpected token %s at position %d",
