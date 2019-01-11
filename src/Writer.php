@@ -36,7 +36,7 @@ class Writer
         fwrite($this->fileHandle, $string);
     }
 
-    public function escapeString($string)
+    protected function escapeString($string)
     {
         $string = str_replace('"', '""', $string);
         if ((strpos($string, '"') !== false) ||
