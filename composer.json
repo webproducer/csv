@@ -18,7 +18,8 @@
     "psr-4" : {
       "CSV\\": "src",
       "CSV\\Test\\": "test"
-    }
+    },
+    "files": ["src/funcs.php"]
   },
   "require": {
     "php": ">=7.0"
