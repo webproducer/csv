@@ -11,16 +11,15 @@ CSV reading, parsing &amp; writing utils
 
 ## Examples
 
-### Parse file (or standart input):
+### Parse file/STDIN:
 
 ```php
 use CSV\Parser;
 
-$src = fopen($argv[1] ?? STDIN, 'r');
+$src = isset($argv[1]) ? fopen($argv[1], 'r') : STDIN;
 foreach ((new Parser)->parse($src) as $row) {
     print_r($row);
 }
-fclose($src);
 ```
 
 ### Parse from string:
@@ -108,21 +107,18 @@ use CSV\{Parser, Options};
 $parser = new Parser(Options::strict());
 ```
 
-In the strict mode source data must follow these rules:
+In the strict mode source data must comply with the following rules:
 
 * No empty lines
-* Same columns count in each row
-* Only `CRLF` ("\r\n") must be used as rows divider 
+* Each row must contain same fields count
+* Only `CRLF` ("\r\n") used as rows divider 
 
 ### Generating CSV
 
 ```php
 use CSV\{Writer, Options};
 
-$writer = new Writer(
-    fopen(STDOUT, 'a'),
-    new Options(";", Options::ENCODING_ISO)
-);
+$writer = new Writer(STDOUT, new Options(';', Options::ENCODING_ISO));
 $writer->writeRow(['Name', 'Age', 'City']);
 $writer->writeRow(['John "Robby" Robinson', '33', 'Aberdeen']);
 $writer->writeRow(['Jane Bridge', '18', 'Springfield']);
