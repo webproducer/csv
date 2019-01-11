@@ -59,7 +59,7 @@ Array
 ...
 ```
 
-### Field mapping
+### Headers mapping
 
 ```php
 use CSV\Parser;
