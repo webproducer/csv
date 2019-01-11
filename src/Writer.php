@@ -1,30 +1,23 @@
 <?php
-
 namespace CSV;
+
 
 class Writer
 {
-    const ENCODING_ISO = 1;
-    const ENCODING_UTF = 2;
-
     protected $fileHandle = null;
-    protected $encoding = self::ENCODING_ISO;
-    protected $sep = ParseTools::DEFAULT_SEPARATOR;
+    protected $options;
 
     /**
      * Writer constructor.
      * @param resource $output
-     * @param int $encoding
-     * @param string $sep
+     * @param Options|null $options
      */
     public function __construct(
         $output,
-        $encoding = self::ENCODING_ISO,
-        $sep = ParseTools::DEFAULT_SEPARATOR
+        Options $options = null
     ) {
-        $this->encoding = $encoding;
         $this->fileHandle = $output;
-        $this->sep = $sep;
+        $this->options = $options ?: Options::withDefaults();
     }
 
     /**
@@ -33,13 +26,25 @@ class Writer
     public function addLine(array $values)
     {
         foreach ($values as $key => $value) {
-            $enc = ParseTools::escapeString($value, $this->sep);
-            if ($this->encoding == self::ENCODING_ISO) {
+            $enc = $this->escapeString($value);
+            if ($this->options->encoding == Options::ENCODING_ISO) {
                 $enc = utf8_decode($enc);
             }
             $values[$key] = $enc;
         }
-        $string = implode($this->sep, $values) . "\r\n";
+        $string = implode($this->options->separator, $values) . "\r\n";
         fwrite($this->fileHandle, $string);
+    }
+
+    public function escapeString($string)
+    {
+        $string = str_replace('"', '""', $string);
+        if ((strpos($string, '"') !== false) ||
+            (strpos($string, $this->options->separator) !== false) ||
+            (strpos($string, "\r") !== false) ||
+            (strpos($string, "\n") !== false)) {
+            $string = '"' . $string . '"';
+        }
+        return $string;
     }
 }
