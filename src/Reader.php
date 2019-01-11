@@ -21,7 +21,7 @@ class Reader implements \Iterator
      */
     public function __construct(
         $file,
-        $separator = Parser::DEFAULT_SEPARATOR,
+        $separator = ParseTools::DEFAULT_SEPARATOR,
         $encoding = self::ENCODING_ISO
     ) {
         $this->separator = $separator;
@@ -53,7 +53,7 @@ class Reader implements \Iterator
             return null;
         }
         try {
-            return Parser::parseString($this->currentLine, $this->separator);
+            return ParseTools::parseString($this->currentLine, $this->separator);
         } catch (\Exception $e) {
             throw new \Exception("{$e->getMessage()} ({$this->currentLine})", $e->getCode(), $e);
         }

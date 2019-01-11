@@ -2,7 +2,7 @@
 
 namespace CSV\Test;
 
-use CSV\Parser;
+use CSV\ParseTools;
 use PHPUnit\Framework\TestCase;
 
 class ParserTest extends TestCase
@@ -15,7 +15,7 @@ class ParserTest extends TestCase
      */
     public function testParseString($string, array $expected)
     {
-        $this->assertSame($expected, Parser::parseString($string));
+        $this->assertSame($expected, ParseTools::parseString($string));
     }
 
     public function parseStringDataProvider()
@@ -43,7 +43,7 @@ class ParserTest extends TestCase
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Illegal unescaped quote.');
-        Parser::parseString($string);
+        ParseTools::parseString($string);
     }
 
     public function parseStringDataProviderException()

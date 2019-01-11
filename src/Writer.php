@@ -9,7 +9,7 @@ class Writer
 
     protected $fileHandle = null;
     protected $encoding = self::ENCODING_ISO;
-    protected $sep = Parser::DEFAULT_SEPARATOR;
+    protected $sep = ParseTools::DEFAULT_SEPARATOR;
 
     /**
      * Writer constructor.
@@ -20,7 +20,7 @@ class Writer
     public function __construct(
         $output,
         $encoding = self::ENCODING_ISO,
-        $sep = Parser::DEFAULT_SEPARATOR
+        $sep = ParseTools::DEFAULT_SEPARATOR
     ) {
         $this->encoding = $encoding;
         $this->fileHandle = $output;
@@ -33,7 +33,7 @@ class Writer
     public function addLine(array $values)
     {
         foreach ($values as $key => $value) {
-            $enc = Parser::escapeString($value, $this->sep);
+            $enc = ParseTools::escapeString($value, $this->sep);
             if ($this->encoding == self::ENCODING_ISO) {
                 $enc = utf8_decode($enc);
             }

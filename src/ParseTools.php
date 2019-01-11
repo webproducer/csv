@@ -1,8 +1,12 @@
 <?php
-
 namespace CSV;
 
-class Parser
+/**
+ * Class ParseTools
+ * @package CSV
+ * @deprecated
+ */
+class ParseTools
 {
     const DEFAULT_SEPARATOR = ',';
 
