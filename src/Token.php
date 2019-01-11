@@ -11,6 +11,7 @@ class Token
     const T_LF = 'T_LF';
     const T_SEP = 'T_SEP';
     const T_TEXTDATA = 'T_TEXTDATA';
+    const T_EOF = 'T_EOF';
 
     public $type = self::T_UNKNOWN;
     public $value = '';

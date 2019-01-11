@@ -8,7 +8,7 @@ class Lexer
 
     private $sep;
 
-    public function __construct(string $separator = ParseTools::DEFAULT_SEPARATOR)
+    public function __construct(string $separator = Options::DEFAULT_SEPARATOR)
     {
         $this->sep = $separator;
     }
@@ -54,7 +54,9 @@ class Lexer
         }
         if (!empty($buf)) {
             yield Token::simple(Token::T_TEXTDATA, $buf, $cur);
+            $pos += strlen($buf);
         }
+        yield Token::simple(Token::T_EOF, '', $pos);
     }
 
     protected static function getTokenMap(): array

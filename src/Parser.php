@@ -10,21 +10,22 @@ class Parser
     const S_QUOTED_FLD = 'S_QUOTED_FLD';
     const S_UNQUOTED_FLD = 'S_UNQUOTED_FLD';
 
-    private $sep;
+    private $options;
 
     private $curState = self::S_NEXT_FLD;
     private $curRow = [];
     private $isReadyToEmit = false;
     private $buf = '';
+    private $columnsCnt = -1;
 
-    public function __construct(string $separator = ParseTools::DEFAULT_SEPARATOR)
+    public function __construct(Options $options = null)
     {
-        $this->sep = $separator;
+        $this->options = $options ?: Options::withDefaults();
     }
 
     /**
      * @todo auto-wrapper for string type
-     * @todo check fields count (in "strict" mode)
+     * @todo accept only CRLF as row divider in strict mode
      * @param resource $stream
      * @return \Generator|array[]
      * @throws Exception
@@ -33,15 +34,19 @@ class Parser
     public function parse($stream): \Generator
     {
         $this->reset();
-        $lexer = new Lexer($this->sep);
+        $lexer = new Lexer($this->options->separator);
         foreach ($lexer->lex($stream) as [$type, $val, $pos]) {
             $this->handleToken($type, $val, $pos);
             if ($this->isReadyToEmit) {
+                if ($this->options->strictMode) {
+                    if ($this->columnsCnt < 0) {
+                        $this->columnsCnt = count($this->curRow);
+                    } elseif (count($this->curRow) !== $this->columnsCnt) {
+                        throw new ParseException("Columns count must be constant in strict mode (position: {$pos})");
+                    }
+                }
                 yield $this->emit();
             }
-        }
-        if ($this->curState !== self::S_NEXT_FLD) {
-            $this->throwParseError($type ?? 'T_EOF', $pos ?? 0);
         }
     }
 
@@ -51,6 +56,7 @@ class Parser
         $this->curRow = [];
         $this->buf = '';
         $this->isReadyToEmit = false;
+        $this->columnsCnt = -1;
     }
 
     private function flushBuf()
@@ -97,6 +103,7 @@ class Parser
                 break;
             case Token::T_LF:
             case Token::T_CR:
+            case Token::T_EOF:
                 $this->handleLineBreak($type, $val, $pos);
                 break;
             case Token::T_TEXTDATA:
@@ -120,7 +127,10 @@ class Parser
     {
         switch ($this->curState) {
             case self::S_NEXT_FLD:
-                // just skip
+                if ($this->options->strictMode && ($type !== Token::T_EOF)) {
+                    throw new ParseException("Empty lines are prohibited in strict mode (position: {$pos})");
+                }
+                // else just skip
                 break;
             case self::S_QUOTED_FLD:
                 $this->buf.= $val;
