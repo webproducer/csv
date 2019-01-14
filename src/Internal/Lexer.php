@@ -32,7 +32,7 @@ class Lexer
                 $c = $data{$i};
                 $pos++;
                 if (isset($map[$c])) {
-                    if (!empty($buf)) {
+                    if ($buf !== '') {
                         yield Token::simple(Token::T_TEXTDATA, $buf, $cur);
                         $buf = '';
                         $cur = -1;
@@ -46,7 +46,7 @@ class Lexer
                 $buf.= $c;
             }
         }
-        if (!empty($buf)) {
+        if ($buf !== '') {
             yield Token::simple(Token::T_TEXTDATA, $buf, $cur);
             $pos += strlen($buf);
         }
