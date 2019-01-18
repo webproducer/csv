@@ -1,6 +1,7 @@
 <?php
 namespace CSV\Internal;
 
+use CSV\Options;
 
 class Lexer
 {
@@ -19,35 +20,36 @@ class Lexer
      */
     public function lex(DataReaderInterface $stream): \Generator
     {
-        $pos = -1;
-        $cur = -1;
+        $pos = 0;
         $buf = '';
         $map = array_merge(self::getTokenMap(), [
             $this->sep => Token::T_SEP
         ]);
+        $brklist = implode(array_keys($map));
         while (!$stream->isEof()) {
             $data = $stream->read(self::READ_SIZE);
             $len = strlen($data);
-            for ($i=0; $i<$len; $i++) {
-                $c = $data{$i};
+            while ($len > 0) {
+                if (($remainStr = strpbrk($data, $brklist)) === false) {
+                    $buf.= $data;
+                    break;
+                }
+                $lenRemain = strlen($remainStr);
+                $current = $buf . substr($data, 0, $len - $lenRemain);
+                if ($current !== '') {
+                    yield Token::simple(Token::T_TEXTDATA, $current, $pos);
+                    $buf = '';
+                    $pos += strlen($current);
+                }
+                $c = $remainStr{0};
+                yield Token::simple($map[$c], $c, $pos);
+                $data = substr($remainStr, 1);
+                $len = $lenRemain - 1;
                 $pos++;
-                if (isset($map[$c])) {
-                    if ($buf !== '') {
-                        yield Token::simple(Token::T_TEXTDATA, $buf, $cur);
-                        $buf = '';
-                        $cur = -1;
-                    }
-                    yield Token::simple($map[$c], $c, $pos);
-                    continue;
-                }
-                if ($cur < 0) {
-                    $cur = $pos;
-                }
-                $buf.= $c;
             }
         }
         if ($buf !== '') {
-            yield Token::simple(Token::T_TEXTDATA, $buf, $cur);
+            yield Token::simple(Token::T_TEXTDATA, $buf, $pos);
             $pos += strlen($buf);
         }
         yield Token::simple(Token::T_EOF, '', $pos);
