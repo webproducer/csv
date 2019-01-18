@@ -1,17 +1,27 @@
 <?php
 namespace CSV\Helpers;
 
+use CSV\ProcessingException;
+
 /**
  * @param \Generator $rows
  * @return \Generator|array[]
+ * @throws ProcessingException
  */
 function mapped(\Generator $rows): \Generator {
-    $headers = null;
-    foreach ($rows as $row) {
-        if (is_null($headers)) {
-            $headers = $row;
-            continue;
+    if (!$rows->valid()) {
+        return;
+    }
+    $headers = $rows->current();
+    $rows->next();
+    $num = 1;
+    while ($rows->valid()) {
+        $num++;
+        $row = array_combine($headers, $rows->current());
+        if ($row === false) {
+            throw new ProcessingException("Error mapping row: column count mismatch in row {$num}");
         }
-        yield array_combine($headers, $row);
+        yield $row;
+        $rows->next();
     }
 }
