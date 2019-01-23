@@ -1,6 +1,7 @@
 <?php
 namespace CSV\Internal;
 
+use CSV\DataReaderInterface;
 
 class StringReader implements DataReaderInterface
 {

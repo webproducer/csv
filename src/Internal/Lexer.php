@@ -1,7 +1,7 @@
 <?php
 namespace CSV\Internal;
 
-use CSV\Options;
+use CSV\{ Options, DataReaderInterface };
 
 class Lexer
 {

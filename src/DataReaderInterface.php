@@ -1,5 +1,5 @@
 <?php
-namespace CSV\Internal;
+namespace CSV;
 
 
 interface DataReaderInterface
