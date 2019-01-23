@@ -122,7 +122,7 @@ use CSV\{Parser, Options};
 $parser = new Parser(Options::tsv());
 ```
 
-### Writing CSV
+### Writing CSV (RFC 4180)
 
 ```php
 use CSV\{Writer, Options};
@@ -136,12 +136,16 @@ $data = [
 // Default (RFC) writer
 fputs(STDOUT, "Default (RFC 4180) format:\n");
 $writer = new Writer();
-$writer->write(new ArrayIterator($data), STDOUT);
+$writer->write($data, STDOUT);
+```
 
+### Writing TSV
+
+```php
 // TSV format
 fputs(STDOUT, "\nTSV format:\n");
 $writer = new Writer(Options::tsv());
-$writer->write(new ArrayIterator($data), STDOUT);
+$writer->write($data, STDOUT);
 ```
 
 ### Writing CSV: writing to string from generator
