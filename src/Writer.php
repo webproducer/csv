@@ -31,7 +31,7 @@ class Writer implements WriterInterface
     /**
      * @inheritDoc
      */
-    public function write(\Iterator $rows, $stream = null): int
+    public function write(iterable $rows, $stream = null): int
     {
         return $this->writer->write($rows, $stream);
     }

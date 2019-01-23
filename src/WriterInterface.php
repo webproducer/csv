@@ -6,12 +6,12 @@ interface WriterInterface
 {
 
     /**
-     * @param \Iterator $rows
+     * @param iterable $rows
      * @param resource|null $stream - Write to given resource, or in internal buffer (if null)
      * @return int - Count of written rows
      * @throws WriteException
      */
-    public function write(\Iterator $rows, $stream = null): int;
+    public function write(iterable $rows, $stream = null): int;
 
     /**
      * Return contents of the internal buffer

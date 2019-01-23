@@ -20,7 +20,7 @@ abstract class BaseWriter implements WriterInterface
     /**
      * @inheritDoc
      */
-    public function write(\Iterator $rows, $stream = null): int
+    public function write(iterable $rows, $stream = null): int
     {
         $stream = $stream ?: $this->initBuffer();
         $num = 0;
