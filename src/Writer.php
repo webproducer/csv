@@ -2,49 +2,47 @@
 namespace CSV;
 
 
-class Writer
+class Writer implements WriterInterface
 {
-    protected $fileHandle = null;
-    protected $options;
+
+    private $writer;
 
     /**
      * Writer constructor.
-     * @param resource $output
      * @param Options|null $options
+     * @throws Exception
      */
-    public function __construct(
-        $output,
-        Options $options = null
-    ) {
-        $this->fileHandle = $output;
-        $this->options = $options ?: Options::withDefaults();
+    public function __construct(Options $options = null)
+    {
+        $options = $options ?: Options::withDefaults();
+        //TODO: make default factory?
+        switch ($options->mode) {
+            case Options::MODE_RFC4180:
+                $this->writer = new RfcWriter($options);
+                break;
+            case Options::MODE_TSV:
+                $this->writer = new TsvWriter($options);
+                break;
+            default:
+                throw new Exception("Unknown write mode: '{$options->mode}'");
+        }
     }
 
     /**
-     * @param array $values
+     * @inheritDoc
      */
-    public function writeRow(array $values)
+    public function write(\Iterator $rows, $stream = null): int
     {
-        foreach ($values as $key => $value) {
-            $enc = $this->escapeString($value);
-            if ($this->options->encoding == Options::ENCODING_ISO) {
-                $enc = utf8_decode($enc);
-            }
-            $values[$key] = $enc;
-        }
-        $string = implode($this->options->separator, $values) . "\r\n";
-        fwrite($this->fileHandle, $string);
+        return $this->writer->write($rows, $stream);
     }
 
-    protected function escapeString($string)
+    /**
+     * @inheritDoc
+     */
+    public function getContents(): string
     {
-        $string = str_replace('"', '""', $string);
-        if ((strpos($string, '"') !== false) ||
-            (strpos($string, $this->options->separator) !== false) ||
-            (strpos($string, "\r") !== false) ||
-            (strpos($string, "\n") !== false)) {
-            $string = '"' . $string . '"';
-        }
-        return $string;
+        return $this->writer->getContents();
     }
+
+
 }
