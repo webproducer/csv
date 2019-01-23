@@ -4,6 +4,7 @@ CSV reading, parsing &amp; writing utils
 ## Features
 
 * Operating according to [RFC 4180](https://tools.ietf.org/html/rfc4180)
+* TSV format (as [described here](https://www.iana.org/assignments/media-types/text/tab-separated-values)) is also supported (and it can be parsed much faster than CSV/RFC4180) 
 * Parsing CSV data from streams - as well as from strings
 * All parsed results are accessible through memory efficient generators
 * Headers mapping
@@ -96,7 +97,7 @@ Array
 ```php
 use CSV\{Parser, Options};
 
-$parser = new Parser(new Options("\t"));
+$parser = new Parser(new Options(";"));
 ```
 
 ### Strict mode
@@ -111,16 +112,48 @@ In the strict mode source data must comply with the following rules:
 
 * No empty lines
 * Each row must contain same fields count
-* Only `CRLF` ("\r\n") used as rows divider 
+* Only `CRLF` ("\r\n") used as rows divider
 
-### Generating CSV
+### TSV parsing
+
+```php
+use CSV\{Parser, Options};
+
+$parser = new Parser(Options::tsv());
+```
+
+### Writing CSV
 
 ```php
 use CSV\{Writer, Options};
 
-$writer = new Writer(STDOUT, new Options(';', Options::ENCODING_ISO));
-$writer->writeRow(['Name', 'Age', 'City']);
-$writer->writeRow(['John "Robby" Robinson', '33', 'Aberdeen']);
-$writer->writeRow(['Jane Bridge', '18', 'Springfield']);
+$data = [
+    ['Name', 'Age', 'Address'],
+    ['John "Robby" Robinson', '33', 'Aberdeen'],
+    ['Jane Bridge', '18', "Springfield\n123\tMain street"]
+];
 
+// Default (RFC) writer
+fputs(STDOUT, "Default (RFC 4180) format:\n");
+$writer = new Writer();
+$writer->write(new ArrayIterator($data), STDOUT);
+
+// TSV format
+fputs(STDOUT, "\nTSV format:\n");
+$writer = new Writer(Options::tsv());
+$writer->write(new ArrayIterator($data), STDOUT);
+```
+
+### Writing CSV: writing to string from generator
+
+```php
+use CSV\{Writer, Options};
+$writer = new Writer(Options::tsv());
+$generate = function(int $cnt) {
+    for ($i=1; $i<=$cnt; $i++) {
+        yield [$i, date("D d M", strtotime("{$i} day ago"))];
+    }
+};
+$writer->write($generate(30));
+echo $writer->getContents(); // used memory will be auto-flushed now
 ```
