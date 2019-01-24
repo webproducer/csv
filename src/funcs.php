@@ -28,9 +28,7 @@ namespace CSV\Helpers {
 
     function unescaped(\Iterator $rows): \Generator {
         foreach ($rows as $row) {
-            yield array_map(function($val) {
-                return stripcslashes($val);
-            }, $row);
+            yield array_map('stripcslashes', $row);
         }
     }
 

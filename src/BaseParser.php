@@ -13,7 +13,7 @@ abstract class BaseParser implements ParserInterface
      */
     public function __construct(Options $options = null)
     {
-        $this->options = $options ?: Options::withDefaults();
+        $this->options = $options ?: Options::defaults();
     }
 
 

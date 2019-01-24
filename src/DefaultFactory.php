@@ -18,7 +18,7 @@ class DefaultFactory implements ParserFactoryInterface
 
     public function make(Options $options = null): ParserInterface
     {
-        $options = $options ?: Options::withDefaults();
+        $options = $options ?: Options::defaults();
         $ffunc = $this->ffuncs[$options->mode] ?? function(Options $options) {
             throw new Exception("Unknown mode: {$options->mode}");
         };

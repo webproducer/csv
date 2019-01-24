@@ -14,7 +14,7 @@ class Writer implements WriterInterface
      */
     public function __construct(Options $options = null)
     {
-        $options = $options ?: Options::withDefaults();
+        $options = $options ?: Options::defaults();
         //TODO: make default factory?
         switch ($options->mode) {
             case Options::MODE_RFC4180:

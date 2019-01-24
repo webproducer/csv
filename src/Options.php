@@ -18,6 +18,8 @@ class Options
     public $strict = false;
     public $mode = self::MODE_RFC4180;
 
+    public $autoEscape = true;
+
     /**
      * Options constructor.
      * @param string $separator
@@ -38,7 +40,7 @@ class Options
         $this->strict = $strict;
     }
 
-    public static function withDefaults()
+    public static function defaults()
     {
         return new self(
             self::DEFAULT_SEPARATOR,
@@ -66,5 +68,36 @@ class Options
         return new self($separator, $encoding, true);
     }
 
+    public function withSeparator(string $separator): self
+    {
+        return new self($separator, $this->encoding, $this->mode, $this->strict);
+    }
+
+    public function withEncoding(int $encoding): self
+    {
+        return new self($this->separator, $encoding, $this->mode, $this->strict);
+    }
+
+    public function withStrictModeEnabled(bool $strict): self
+    {
+        return new self($this->separator, $this->encoding, $this->mode, true);
+    }
+
+    public function withStrictModeDisabled(): self
+    {
+        return new self($this->separator, $this->encoding, $this->mode, false);
+    }
+
+    public function withMode(string $mode): self
+    {
+        return new self($this->separator, $this->encoding, $mode, $this->strict);
+    }
+
+    public function withAutoEscapeDisabled(): self
+    {
+        $clone = new self($this->separator, $this->encoding, $this->mode, true);
+        $clone->autoEscape = false;
+        return $clone;
+    }
 
 }

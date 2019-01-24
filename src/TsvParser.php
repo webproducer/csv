@@ -13,7 +13,8 @@ class TsvParser extends BaseParser
      */
     public function parse($stream): \Iterator
     {
-        return unescaped($this->generate($stream));
+        $rows = $this->generate($stream);
+        return $this->options->autoEscape ? unescaped($rows) : $rows;
     }
 
     private function generate($stream): \Iterator
