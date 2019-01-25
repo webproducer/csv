@@ -70,34 +70,39 @@ class Options
 
     public function withSeparator(string $separator): self
     {
-        return new self($separator, $this->encoding, $this->mode, $this->strict);
+        return $this->makeCloneWithNewValue('separator', $separator);
     }
 
     public function withEncoding(int $encoding): self
     {
-        return new self($this->separator, $encoding, $this->mode, $this->strict);
+        return $this->makeCloneWithNewValue('encoding', $encoding);
     }
 
-    public function withStrictModeEnabled(bool $strict): self
+    public function withStrictModeEnabled(): self
     {
-        return new self($this->separator, $this->encoding, $this->mode, true);
+        return $this->makeCloneWithNewValue('strict', true);
     }
 
     public function withStrictModeDisabled(): self
     {
-        return new self($this->separator, $this->encoding, $this->mode, false);
+        return $this->makeCloneWithNewValue('strict', false);
     }
 
     public function withMode(string $mode): self
     {
-        return new self($this->separator, $this->encoding, $mode, $this->strict);
+        return $this->makeCloneWithNewValue('mode', $mode);
     }
 
     public function withAutoEscapeDisabled(): self
     {
-        $clone = new self($this->separator, $this->encoding, $this->mode, true);
-        $clone->autoEscape = false;
-        return $clone;
+        return $this->makeCloneWithNewValue('autoEscape', false);
+    }
+
+    private function makeCloneWithNewValue(string $field, $newValue): self
+    {
+        $c = clone $this;
+        $c->$field = $newValue;
+        return $c;
     }
 
 }
