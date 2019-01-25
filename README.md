@@ -12,18 +12,28 @@ CSV reading, parsing &amp; writing utils
 
 ## Examples
 
-### Parse file/STDIN:
+### Parse stream
 
 ```php
 use CSV\Parser;
 
-$src = isset($argv[1]) ? fopen($argv[1], 'r') : STDIN;
-foreach ((new Parser)->parse($src) as $row) {
+foreach ((new Parser)->parse(STDIN) as $row) {
+    print_r($row);
+}
+// note: stream won't close automatically 
+```
+
+### Parse file
+
+```php
+use function CSV\Helpers\parseFile;
+
+foreach (parseFile($argv[1]) as $row) {
     print_r($row);
 }
 ```
 
-### Parse from string:
+### Parse string
 
 ```php
 use CSV\Parser;
