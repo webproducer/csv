@@ -5,28 +5,41 @@ namespace CSV\Helpers {
 
     /**
      * @param \Iterator $rows
-     * @return \Generator|array[]
+     * @param array|null $headers - Custom headers (if null, headers will be parsed from the first line)
+     * @return \Iterator|array[]
      * @throws ProcessingException
      */
-    function mapped(\Iterator $rows): \Generator {
+    function mapped(\Iterator $rows, array $headers = null): \Iterator {
         if (!$rows->valid()) {
             return;
         }
-        $headers = $rows->current();
-        $rows->next();
-        $num = 1;
+        if (!$headers) {
+            $headers = $rows->current();
+            $rows->next();
+        }
+        $row = null;
         while ($rows->valid()) {
-            $num++;
-            $row = array_combine($headers, $rows->current());
-            if ($row === false) {
-                throw new ProcessingException("Error mapping row: column count mismatch in row {$num}");
+            try {
+                $row = array_combine($headers, $rows->current());
+            } catch (\ErrorException $e) {
+                // just pass
+            }
+            $rows->next();
+            if (($row === false) || is_null($row)) {
+                throw new ProcessingException(sprintf(
+                    "Error mapping row: column count mismatch in row %d",
+                    $rows->key() + 1
+                ));
             }
             yield $row;
-            $rows->next();
         }
     }
 
-    function unescaped(\Iterator $rows): \Generator {
+    /**
+     * @param \Iterator $rows
+     * @return \Iterator|array[]
+     */
+    function unescaped(\Iterator $rows): \Iterator {
         foreach ($rows as $row) {
             yield array_map('stripcslashes', $row);
         }
