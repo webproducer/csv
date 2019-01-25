@@ -156,7 +156,7 @@ $writer = new Writer(Options::tsv());
 $writer->write($data, STDOUT);
 ```
 
-### Writing CSV: writing to string from generator
+### Writing from generator (using internal string buffer)
 
 ```php
 use CSV\{Writer, Options};
