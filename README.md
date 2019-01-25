@@ -144,7 +144,6 @@ $data = [
 ];
 
 // Default (RFC) writer
-fputs(STDOUT, "Default (RFC 4180) format:\n");
 $writer = new Writer();
 $writer->write($data, STDOUT);
 ```
@@ -153,7 +152,6 @@ $writer->write($data, STDOUT);
 
 ```php
 // TSV format
-fputs(STDOUT, "\nTSV format:\n");
 $writer = new Writer(Options::tsv());
 $writer->write($data, STDOUT);
 ```
