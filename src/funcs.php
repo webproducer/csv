@@ -12,7 +12,8 @@ namespace CSV\Helpers {
      * @return \Iterator|array[]
      * @throws ProcessingException
      */
-    function mapped(\Iterator $rows, array $headers = null): \Iterator {
+    function mapped(\Iterator $rows, array $headers = null): \Iterator
+    {
         if (!$rows->valid()) {
             return;
         }
@@ -42,12 +43,13 @@ namespace CSV\Helpers {
      * @param \Iterator $rows
      * @return \Iterator|array[]
      */
-    function unescaped(\Iterator $rows): \Iterator {
+    function unescaped(\Iterator $rows): \Iterator
+    {
         foreach ($rows as $row) {
             yield array_map('stripcslashes', $row);
         }
     }
-
+    
     /**
      * @param string $filename
      * @param Options|null $options
