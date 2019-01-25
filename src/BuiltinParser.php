@@ -15,7 +15,11 @@ class BuiltinParser extends BaseParser
         [$stream, $isTmp] = toStream($stream);
         try {
             while (!feof($stream)) {
-                yield fgetcsv($stream, 0, $this->options->separator);
+                $row = fgetcsv($stream, 0, $this->options->separator);
+                if ((count($row) === 1) && is_null($row[0])) {
+                    continue;
+                }
+                yield $row;
             }
         } finally {
             if ($isTmp) {
