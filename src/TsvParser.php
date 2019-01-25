@@ -23,6 +23,9 @@ class TsvParser extends BaseParser
         try {
             while (!feof($stream)) {
                 $line = rtrim(fgets($stream), "\r\n");
+                if (empty($line)) {
+                    continue;
+                }
                 yield explode($this->options->separator, $line);
             }
         } finally {
