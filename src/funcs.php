@@ -1,6 +1,9 @@
 <?php
 namespace CSV\Helpers {
 
+    use CSV\IOException;
+    use CSV\Options;
+    use CSV\Parser;
     use CSV\ProcessingException;
 
     /**
@@ -42,6 +45,29 @@ namespace CSV\Helpers {
     function unescaped(\Iterator $rows): \Iterator {
         foreach ($rows as $row) {
             yield array_map('stripcslashes', $row);
+        }
+    }
+
+    /**
+     * @param string $filename
+     * @param Options|null $options
+     * @return \Iterator
+     * @throws IOException
+     * @throws \CSV\Exception
+     * @throws \CSV\ParseException
+     */
+    function parseFile(string $filename, Options $options = null): \Iterator
+    {
+        $fp = fopen($filename, 'r');
+        if (!$fp) {
+            throw new IOException("Can't open {$filename} for reading");
+        }
+        try {
+            foreach ((new Parser($options))->parse($fp) as $row) {
+                yield $row;
+            }
+        } finally {
+            fclose($fp);
         }
     }
 
