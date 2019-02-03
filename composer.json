@@ -24,7 +24,11 @@
   "require": {
     "php": ">=7.1"
   },
+  "suggest": {
+    "amphp/byte-stream": "If you want to process CSV in async mode with Amp"
+  },
   "require-dev": {
-    "phpunit/phpunit": "^7.1"
+    "phpunit/phpunit": "^7.1",
+    "amphp/byte-stream": "^1.5"
   }
 }

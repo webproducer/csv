@@ -43,7 +43,6 @@ class TsvParser extends BaseParser
                 fclose($stream);
             }
         }
-
     }
 
 
