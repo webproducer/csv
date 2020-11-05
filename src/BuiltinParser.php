@@ -3,7 +3,6 @@ namespace CSV;
 
 use function CSV\Helpers\IO\toStream;
 
-
 class BuiltinParser extends BaseParser
 {
 
@@ -15,8 +14,7 @@ class BuiltinParser extends BaseParser
         [$stream, $isTmp] = toStream($stream);
         try {
             $num = 0;
-            while (!feof($stream)) {
-                $row = fgetcsv($stream, 0, $this->options->separator);
+            while (($row = fgetcsv($stream, 0, $this->options->separator)) !== false) {
                 $num++;
                 if ((count($row) === 1) && is_null($row[0])) {
                     if ($this->options->strict) {
@@ -32,6 +30,4 @@ class BuiltinParser extends BaseParser
             }
         }
     }
-
-
 }
